@@ -112,7 +112,7 @@ function CreateEntry(imageSrc){
     newEntry.appendChild(newEntryThumbnailContainer);
 
     libraryEntryList.appendChild(newEntry);
-    console.log(imageSrc);
+    
     newEntry.addEventListener('click', (event) => OnSelectImage(event, imageSrc))
 }
 
