@@ -1,5 +1,7 @@
 Neutralino.init();
 
+
+
 async function Minimise(){
     await Neutralino.window.minimize();
 }
@@ -25,7 +27,10 @@ function Exit(){
     Neutralino.window.exit();
 }
 
+
+
 const libraryContainer = document.getElementById('libraryContainer');
+const libraryEntryList = document.getElementById('libraryEntryList');
 const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
 var entryElements = Array.from(document.getElementsByClassName('entry'));
@@ -36,9 +41,11 @@ libraryContainer.addEventListener('drop', (event) => OnImageDropped(event));
 
 entryElements.forEach(entry => {
     let src = entry.getElementsByTagName('img')[0].src;
-    entry.addEventListener('click', (event) => OnImageSelected(event, src));
+    entry.addEventListener('click', (event) => OnSelectImage(event, src));
 });
 libraryContainer.addEventListener('click', (event) => OnImageDeselected(event));
+
+
 
 function OnLibraryDragOver(event){
     event.preventDefault();
@@ -61,7 +68,7 @@ function OnImageDropped(event){
     }
 }
 
-function OnImageSelected(event, imageSrc){
+function OnSelectImage(event, imageSrc){
     event.stopPropagation();
     SelectImage(imageSrc)
 }
@@ -72,19 +79,41 @@ function OnImageDeselected(event){
 
 
 
-
 function AddImage(image){
-    if (image != null && image.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            imageDisplay.src = event.target.result;
-        };
-        reader.readAsDataURL(image);
-    } 
+    if (image == null || !image.type.startsWith('image/')) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        let src = event.target.result;
+        SelectImage(src);
+        CreateEntry(src);
+    };
+    reader.readAsDataURL(image);
 }
 
 function AddImageSet(images){
+    // TODO: Add actual image set.
+    // Currently just adds the first image in the set.
     AddImage(images[0]);  
+}
+
+function CreateEntry(imageSrc){
+    let newEntry = document.createElement('li');
+    newEntry.classList.add('entry');
+
+    let newEntryThumbnailContainer = document.createElement('div');
+    newEntryThumbnailContainer.classList.add('entryThumbnailContainer');
+
+    let newEntryThumbnail = document.createElement('img');
+    newEntryThumbnail.classList.add('entryThumbnail');
+    newEntryThumbnail.src = imageSrc;
+
+    newEntryThumbnailContainer.appendChild(newEntryThumbnail);
+    newEntry.appendChild(newEntryThumbnailContainer);
+
+    libraryEntryList.appendChild(newEntry);
+    console.log(imageSrc);
+    newEntry.addEventListener('click', (event) => OnSelectImage(event, imageSrc))
 }
 
 function SelectImage(imageSrc){
