@@ -90,11 +90,9 @@ function AddImage(image){
     };
     reader.readAsDataURL(image);
 }
-
+ 
 function AddImageSet(images){
-    // TODO: Add actual image set.
-    // Currently just adds the first image in the set.
-    AddImage(images[0]);  
+    Array.from(images).forEach((image) => AddImage(image));
 }
 
 function CreateEntry(imageSrc){
@@ -112,7 +110,7 @@ function CreateEntry(imageSrc){
     newEntry.appendChild(newEntryThumbnailContainer);
 
     libraryEntryList.appendChild(newEntry);
-    
+
     newEntry.addEventListener('click', (event) => OnSelectImage(event, imageSrc))
 }
 
