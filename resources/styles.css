@@ -17,6 +17,8 @@ div {
     height: 100%;
 }
 
+/* Image library styles */
+
 #libraryContainer {
     position: absolute;
     width: 60%;
@@ -63,6 +65,7 @@ div {
     object-fit: contain;
 }
 
+/* Image display styles */
 
 #displayContainer {
     position: absolute;
@@ -90,6 +93,8 @@ div {
     max-height: calc(100% - 16px);
     object-fit: contain;
 }
+
+/* Image metadata styles */
 
 #metaDisplayContainer {
     position: relative;
