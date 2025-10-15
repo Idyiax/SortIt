@@ -49,16 +49,13 @@ const imageDisplay = document.getElementById('imageDisplay');
 var entryElements = Array.from(document.getElementsByClassName('entry'));
 
 // Events
-libraryContainer.addEventListener('dragover', (event) => OnLibraryDragOver(event));
-displayContainer.addEventListener('dragover', (event) => OnDisplayDragOver(event));
-libraryContainer.addEventListener('drop', (event) => OnImageDropped(event));
+libraryContainer.addEventListener('dragover', OnLibraryDragOver);
+displayContainer.addEventListener('dragover', OnDisplayDragOver);
+libraryContainer.addEventListener('drop', OnImageDropped);
 
-entryElements.forEach(entry => {
-    let src = entry.getElementsByTagName('img')[0].src;
-    entry.addEventListener('click', (event) => OnSelectEntry(event, src));
-});
-libraryContainer.addEventListener('click', (event) => OnEntryDeselected(event));
+libraryContainer.addEventListener('click', OnEntryDeselected);
 
+document.addEventListener('keydown', KeyPressedLibrary)
 
 // Event functions
 function OnLibraryDragOver(event){
@@ -87,30 +84,46 @@ function OnSelectEntry(event, imageID){
     SelectEntry(imageID)
 }
 
-function OnEntryDeselected(event){
+function OnEntryDeselected(){
     DeselectEntry();
 }
 
+function KeyPressedLibrary(event){
+    console.log("Que");
+    if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        if(SelectedEntryIndex == 0) SelectEntry(EntryData.length - 1);
+        else SelectEntry(SelectedEntryIndex - 1);
+    } 
+    else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        if(SelectedEntryIndex == EntryData.length - 1) SelectEntry(0);
+        else SelectEntry(SelectedEntryIndex + 1);
+    }
+};
+
 
 // Main functions
-function AddEntry(image){
-    if (image == null || !image.type.startsWith('image/')) return;
+function AddEntry(input){
+    if (input == null || !input.type.startsWith('image/')) return;
 
     const reader = new FileReader();
     reader.onload = function(event) {
         let src = event.target.result;
+        let id = EntryData.length;
+
         EntryData.push({
             src: src
         })
-
-        CreateDOMEntry(EntryData.length - 1);
-        SelectEntry(EntryData.length - 1);
+        
+        EntryData[id].html = CreateDOMEntry(id)
+        SelectEntry(id);
     };
-    reader.readAsDataURL(image);
+    reader.readAsDataURL(input);
 }
  
-function AddImageSet(images){
-    Array.from(images).forEach((image) => AddEntry(image));
+function AddImageSet(input){
+    Array.from(input).forEach(AddEntry);
 }
 
 function CreateDOMEntry(entryID){
@@ -130,24 +143,34 @@ function CreateDOMEntry(entryID){
 
     libraryEntryList.appendChild(newEntry);
 
-    newEntry.addEventListener('click', (event) => OnSelectEntry(event, entryID))
+    newEntry.addEventListener('click', (event) => OnSelectEntry(event, entryID));
+
+    return newEntry;
 }
 
 function SelectEntry(entryID){
+    DeselectEntry();
+
     let entry = EntryData[entryID];
     if(entry == null || entry.src == null){
         DeselectEntry()
         return;
     }
 
+    SelectedEntryIndex = entryID;
     imageDisplay.src = entry.src;
+
+    entry.html.id = "selectedEntry";
 }
 
 function DeselectEntry(){
+    if(SelectedEntryIndex == null) return;
+
+    SelectedEntry().html.id = "";
     SelectedEntryIndex = null;
     imageDisplay.src = "";
 }
 
-function GetSelectedEntry() {
+function SelectedEntry(){
     return EntryData[SelectedEntryIndex];
 }
