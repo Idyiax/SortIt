@@ -89,18 +89,23 @@ function OnEntryDeselected(){
 }
 
 function KeyPressedLibrary(event){
-    console.log("Que");
-    if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        if(SelectedEntryIndex == 0) SelectEntry(EntryData.length - 1);
-        else SelectEntry(SelectedEntryIndex - 1);
-    } 
-    else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        if(SelectedEntryIndex == EntryData.length - 1) SelectEntry(0);
-        else SelectEntry(SelectedEntryIndex + 1);
+    switch(event.key){
+        case('ArrowLeft'):
+            event.preventDefault();
+            if(SelectedEntryIndex == 0) SelectEntry(EntryData.length - 1);
+            else SelectEntry(SelectedEntryIndex - 1);
+            break;
+        case('ArrowRight'):
+            event.preventDefault();
+            if(SelectedEntryIndex == EntryData.length - 1) SelectEntry(0);
+            else SelectEntry(SelectedEntryIndex + 1);
+            break;
+        case('Delete'):
+            event.preventDefault();
+            RemoveEntry(SelectedEntryIndex);
+            break;
     }
-};
+}
 
 
 // Main functions
@@ -126,6 +131,13 @@ function AddImageSet(input){
     Array.from(input).forEach(AddEntry);
 }
 
+async function RemoveEntry(entryID){
+    if(SelectedEntryIndex == entryID) DeselectEntry();
+
+    await RemoveDOMEntry(entryID);
+    EntryData[entryID] = null;
+}
+
 function CreateDOMEntry(entryID){
     let newEntry = document.createElement('li');
     newEntry.classList.add('entry');
@@ -146,6 +158,10 @@ function CreateDOMEntry(entryID){
     newEntry.addEventListener('click', (event) => OnSelectEntry(event, entryID));
 
     return newEntry;
+}
+
+async function RemoveDOMEntry(entryID){
+    await EntryData[entryID].html.remove();
 }
 
 function SelectEntry(entryID){
