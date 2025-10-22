@@ -1,34 +1,3 @@
-Neutralino.init();
-
-
-
-// Neutralino functions
-async function Minimise(){
-    await Neutralino.window.minimize();
-}
-
-async function Maximise(){
-    await Neutralino.window.maximise();
-}
-
-async function UnMaximise(){
-    await Neutralino.window.unmaximise();
-}
-
-async function ToggleMaximise(){
-    if(await Neutralino.window.isMaximized()){
-        UnMaximise();
-    }
-    else{
-        Maximise();
-    }
-}
-
-function Exit(){
-    Neutralino.window.exit();
-}
-
-
 // Vars
 var SelectedEntryIndex; // The index of the currently selected entry.
 var DisplayedEntryIndexes = []; // List of all entry indexes currently being shown. Entries are displayed in the order of this list.
