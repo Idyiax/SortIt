@@ -86,6 +86,11 @@ function AddEntry(input){
         let src = event.target.result;
         let id = EntryData.length;
 
+        window.api.addImage({
+            src: src,
+            type: input.type
+        });
+
         EntryData.push({
             src: src
         })
