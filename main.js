@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 const fs = require('node:fs').promises
 const { existsSync, mkdirSync } = require('node:fs')
+const db = require('./db');
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -61,11 +62,14 @@ async function AddImage(event, image){
     const fileName = `${Date.now()}.${extension}`;
     const filePath = path.join(imagesDir, fileName);
 
+    db.addImage(filePath);
+
     const buffer = Buffer.from(dataBase64, 'base64');
     await fs.writeFile(filePath, buffer);
+   
     console.log('Saved image to', filePath);
   }
-  catch(err){
-    console.error('Failed to save image', err);
+  catch(error){
+    console.error('Failed to save image', error);
   }
 }
