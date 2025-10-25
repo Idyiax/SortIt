@@ -33,6 +33,16 @@ app.on('window-all-closed', () => {
 // IPC Handlers
 ipcMain.handle('add-image', AddImage)
 
+ipcMain.handle('get-images', () => {
+  try{
+    return db.getImages();
+  }
+  catch (error){
+    console.error(error);
+    return[];
+  }
+})
+
 
 
 // Functions

@@ -2,16 +2,14 @@ const Database = require('better-sqlite3')
 const path = require('path')
 
 module.exports = {
-    addImage: AddImage
+    addImage: AddImage,
+    getImages: GetImages
 };
 
-console.log(process.env.NODE_ENV);
 const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.join(process.resourcesPath, 'database.db')
 
 const db = new Database(dbPath)
-
-console.log('Database path:', dbPath);
-
+db.pragma('journal_mode = WAL');
 
 const createTables = `
     CREATE TABLE IF NOT EXISTS images (
@@ -38,4 +36,10 @@ function AddImage(imagePath){
         console.error('Error adding image to database:', error)
         throw error;
     }
+}
+
+const getImagesSql = db.prepare('SELECT * FROM iMAGES');
+
+function GetImages(){
+    return getImagesSql.all();
 }
