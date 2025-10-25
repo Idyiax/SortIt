@@ -72,14 +72,17 @@ async function AddImage(event, image){
     const fileName = `${Date.now()}.${extension}`;
     const filePath = path.join(imagesDir, fileName);
 
-    db.addImage(filePath);
+    const entryRow = db.addImage(filePath);
 
     const buffer = Buffer.from(dataBase64, 'base64');
     await fs.writeFile(filePath, buffer);
    
     console.log('Saved image to', filePath);
+    
+    return entryRow;
   }
   catch(error){
     console.error('Failed to save image', error);
+    return undefined;
   }
 }

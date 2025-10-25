@@ -27,10 +27,12 @@ catch (error){
 
 
 const addImageSql = db.prepare('INSERT INTO images (path) VALUES (?)');
+const getImageSQL = db.prepare('SELECT * FROM images WHERE id=(?)');
 
 function AddImage(imagePath){
     try {
-        addImageSql.run(imagePath);
+        const newImageId = addImageSql.run(imagePath).lastInsertRowid;
+        return getImageSQL.get(newImageId);
     }
     catch (error){
         console.error('Error adding image to database:', error)

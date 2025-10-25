@@ -1,21 +1,13 @@
 // Vars
-var SelectedEntryIndex; // The index of the currently selected entry.
-var DisplayedEntryIndexes = []; // List of all entry indexes currently being shown. Entries are displayed in the order of this list.
-var EntryData = []; // List of all entries in order of how they've been added. Should not be sorted, only added to.
+let SelectedId; // The Id of the selected entry.
+let Entries = []; // All current entries within the database. Populated on window load.
 
-var CurrentSortingMode;
-
-const SortingModes = {
-    ALPHABETICAL: 0,
-    DATEADDED: 1
-}
 
 // Dom elements
 const libraryContainer = document.getElementById('libraryContainer');
 const libraryEntryList = document.getElementById('libraryEntryList');
 const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
-var entryElements = Array.from(document.getElementsByClassName('entry'));
 
 // Events
 libraryContainer.addEventListener('dragover', OnLibraryDragOver);
@@ -24,7 +16,9 @@ libraryContainer.addEventListener('drop', OnImageDropped);
 
 libraryContainer.addEventListener('click', OnEntryDeselected);
 
-document.addEventListener('keydown', KeyPressedLibrary)
+document.addEventListener('keydown', OnLibraryKeyPressed)
+
+window.addEventListener('load', OnLoad);
 
 // Event functions
 function OnLibraryDragOver(event){
@@ -48,119 +42,145 @@ function OnImageDropped(event){
     }
 }
 
-function OnSelectEntry(event, imageID){
+function OnSelectEntry(event, id){
     event.stopPropagation();
-    SelectEntry(imageID)
+    SelectEntry(id)
 }
+
 
 function OnEntryDeselected(){
     DeselectEntry();
 }
 
-function KeyPressedLibrary(event){
+function OnLibraryKeyPressed(event){
     switch(event.key){
         case('ArrowLeft'):
             event.preventDefault();
-            if(SelectedEntryIndex == 0) SelectEntry(EntryData.length - 1);
-            else SelectEntry(SelectedEntryIndex - 1);
+            SelectPreviousEntry();
             break;
         case('ArrowRight'):
             event.preventDefault();
-            if(SelectedEntryIndex == EntryData.length - 1) SelectEntry(0);
-            else SelectEntry(SelectedEntryIndex + 1);
+            SelectNextEntry();
             break;
         case('Delete'):
             event.preventDefault();
-            RemoveEntry(SelectedEntryIndex);
+            //RemoveEntry(SelectedEntryIndex);
             break;
     }
 }
 
+async function OnLoad(){
+    Entries = await window.api.getImages();
+    Entries.forEach((entry) => {
+        CreateDOMEntry(entry.id);
+    })
+}
+
 
 // Main functions
+function GetEntry(entryId){
+    return Entries.find((entry) => entry.id === entryId);
+}
+
+function SelectedEntry(){
+    return GetEntry(SelectedId);
+}
+
 function AddEntry(input){
     if (input == null || !input.type.startsWith('image/')) return;
 
     const reader = new FileReader();
-    reader.onload = function(event) {
-        let src = event.target.result;
-        let id = EntryData.length;
-
-        window.api.addImage({
-            src: src,
-            type: input.type
-        });
-
-        EntryData.push({
-            src: src
-        })
-        
-        EntryData[id].html = CreateDOMEntry(id)
-        SelectEntry(id);
-    };
     reader.readAsDataURL(input);
+    reader.onload = async function(event) {
+        let src = event.target.result;
+
+        const newEntry = await window.api.addImage({
+                src: src,
+                type: input.type
+            })
+        
+        if(newEntry != null) Entries.push(newEntry);
+
+        CreateDOMEntry(newEntry.id)
+        SelectEntry(newEntry.id);
+    };
 }
  
 function AddImageSet(input){
     Array.from(input).forEach(AddEntry);
 }
 
+/*
 async function RemoveEntry(entryID){
     if(SelectedEntryIndex == entryID) DeselectEntry();
 
     await RemoveDOMEntry(entryID);
-    EntryData[entryID] = null;
+    EntryData[EntryData.findIndex((entry) => entry.id === entryId)] = null;
 }
+*/
 
-function CreateDOMEntry(entryID){
+function CreateDOMEntry(id){
+    let entry = GetEntry(id);
+
     let newEntry = document.createElement('li');
     newEntry.classList.add('entry');
-    newEntry.entryID = entryID;
 
     let newEntryThumbnailContainer = document.createElement('div');
     newEntryThumbnailContainer.classList.add('entryThumbnailContainer');
 
     let newEntryThumbnail = document.createElement('img');
     newEntryThumbnail.classList.add('entryThumbnail');
-    newEntryThumbnail.src = EntryData[entryID].src;
+    newEntryThumbnail.src = entry.path;
 
     newEntryThumbnailContainer.appendChild(newEntryThumbnail);
     newEntry.appendChild(newEntryThumbnailContainer);
 
     libraryEntryList.appendChild(newEntry);
 
-    newEntry.addEventListener('click', (event) => OnSelectEntry(event, entryID));
+    newEntry.addEventListener('click', (event) => OnSelectEntry(event, id));
 
-    return newEntry;
+    entry.html = newEntry;
 }
 
+/*
 async function RemoveDOMEntry(entryID){
-    await EntryData[entryID].html.remove();
+    await GetEntry(entryID).html.remove();
 }
+*/
 
-function SelectEntry(entryID){
+function SelectEntry(id){
     DeselectEntry();
 
-    let entry = EntryData[entryID];
-    if(entry == null || entry.src == null){
+    let entry = GetEntry(id);
+    if(entry == null || entry.path == null){
         DeselectEntry()
         return;
     }
 
-    SelectedEntryIndex = entryID;
-    imageDisplay.src = entry.src;
+    SelectedId = id;
+    imageDisplay.src = entry.path;
 
     entry.html.id = "selectedEntry";
 }
 
-function DeselectEntry(){
-    if(SelectedEntryIndex == null) return;
+function SelectNextEntry(){
+    let entryIndex = Entries.findIndex((entry) => entry.id === SelectedId);
 
-    SelectedEntry().html.id = "";
-    SelectedEntryIndex = null;
-    imageDisplay.src = "";
+    if(entryIndex == Entries.length - 1) SelectEntry(Entries[0].id);
+    else SelectEntry(Entries[entryIndex + 1].id);
 }
 
-function SelectedEntry(){
-    return EntryData[SelectedEntryIndex];
+function SelectPreviousEntry(){
+    let entryIndex = Entries.findIndex((entry) => entry.id === SelectedId);
+    
+    if(entryIndex == 0) SelectEntry(Entries[Entries.length - 1].id);
+    else SelectEntry(Entries[entryIndex - 1].id);
+}
+
+function DeselectEntry(){
+    if(SelectedId == null) return;
+
+    SelectedEntry().html.id = "";
+    SelectedId = null;
+    imageDisplay.src = "";
 }
