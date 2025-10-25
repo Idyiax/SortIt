@@ -43,7 +43,15 @@ ipcMain.handle('get-images', () => {
   }
 })
 
-
+ipcMain.handle('remove-image', (event, imageId) => {
+  try{
+    fs.unlink(db.getImage(imageId).path);
+    db.removeImage(imageId);
+  }
+  catch (error){
+    console.error(error);
+  }
+})
 
 // Functions
 async function AddImage(event, image){
@@ -78,7 +86,7 @@ async function AddImage(event, image){
     await fs.writeFile(filePath, buffer);
    
     console.log('Saved image to', filePath);
-    
+
     return entryRow;
   }
   catch(error){

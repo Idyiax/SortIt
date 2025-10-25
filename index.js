@@ -64,7 +64,7 @@ function OnLibraryKeyPressed(event){
             break;
         case('Delete'):
             event.preventDefault();
-            //RemoveEntry(SelectedEntryIndex);
+            RemoveEntry(SelectedId);
             break;
     }
 }
@@ -110,14 +110,16 @@ function AddImageSet(input){
     Array.from(input).forEach(AddEntry);
 }
 
-/*
-async function RemoveEntry(entryID){
-    if(SelectedEntryIndex == entryID) DeselectEntry();
+function RemoveEntry(entryId){
+    if(SelectedId == entryId) DeselectEntry();
 
-    await RemoveDOMEntry(entryID);
-    EntryData[EntryData.findIndex((entry) => entry.id === entryId)] = null;
+    let entry = GetEntry(entryId);
+    entry.html.remove()
+
+    window.api.removeImage(entryId);
+
+    Entries.splice(Entries.indexOf(entry), 1);
 }
-*/
 
 function CreateDOMEntry(id){
     let entry = GetEntry(id);
@@ -141,12 +143,6 @@ function CreateDOMEntry(id){
 
     entry.html = newEntry;
 }
-
-/*
-async function RemoveDOMEntry(entryID){
-    await GetEntry(entryID).html.remove();
-}
-*/
 
 function SelectEntry(id){
     DeselectEntry();

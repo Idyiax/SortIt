@@ -3,7 +3,9 @@ const path = require('path')
 
 module.exports = {
     addImage: AddImage,
-    getImages: GetImages
+    getImage: GetImage,
+    getImages: GetImages,
+    removeImage: RemoveImage
 };
 
 const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.join(process.resourcesPath, 'database.db')
@@ -28,6 +30,8 @@ catch (error){
 
 const addImageSql = db.prepare('INSERT INTO images (path) VALUES (?)');
 const getImageSQL = db.prepare('SELECT * FROM images WHERE id=(?)');
+const getImagesSql = db.prepare('SELECT * FROM images');
+const removeImageSql = db.prepare('DELETE FROM images WHERE id=(?)');
 
 function AddImage(imagePath){
     try {
@@ -40,8 +44,26 @@ function AddImage(imagePath){
     }
 }
 
-const getImagesSql = db.prepare('SELECT * FROM iMAGES');
+function GetImage(imageId){
+    try {
+        return getImageSQL.get(imageId);
+    }
+    catch (error){
+        console.error('Error getting image from database:', error);
+        throw error;
+    }
+}
 
 function GetImages(){
     return getImagesSql.all();
+}
+
+function RemoveImage(imageId){
+    try {
+        removeImageSql.run(imageId);
+    }
+    catch (error){
+        console.error('Error removing image from database:', error);
+        throw error;
+    }
 }
