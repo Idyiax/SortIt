@@ -4,7 +4,7 @@ body {
     user-select: none;
 }
 
-div {
+#main {
     font-family: Arial, sans-serif;
     font-size: 16px;
     color: #000000;
@@ -26,7 +26,20 @@ div {
     border-right: 2px solid #111111;
     box-sizing: border-box;
     overflow-y: clip;
-    padding: 8px;
+}
+
+#libraryEntryListContainer{
+    width: 100%;
+    height: calc(100% - 64px);
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #222222 #333333;
+}
+
+.libraryBar {
+    width: 100%;
+    height: 32px;
+    background-color: #222222;
 }
 
 #libraryEntryList{
@@ -35,7 +48,7 @@ div {
     flex-basis: auto;
     overflow-y: auto;
     padding: 0px;
-    margin: 0px;
+    margin: 8px 8px 0px 8px;
 }
 
 .entry{
@@ -108,8 +121,27 @@ div {
 /* Image metadata styles */
 
 #metaDisplayContainer {
-    position: relative;
     width: 100%;
-    height: 30%;
-    box-sizing: border-box;
+    display: flex;
+}
+
+#nameDisplayBar {
+    width: 100%;
+    height: fit-content;
+    background-color: #222222;
+    padding: 8px;
+}
+
+#nameDisplayContainer {
+
+}
+
+#nameDisplay {
+    color: white;
+    font-size: 24px;
+    margin: 0px;
+}
+
+#propertiesContainer {
+    margin: 0px;
 }
