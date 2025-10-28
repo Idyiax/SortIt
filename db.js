@@ -5,7 +5,8 @@ module.exports = {
     addImage: AddImage,
     getImage: GetImage,
     getImages: GetImages,
-    removeImage: RemoveImage
+    removeImage: RemoveImage,
+    setName: SetName,
 };
 
 const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.join(process.resourcesPath, 'database.db')
@@ -16,7 +17,8 @@ db.pragma('journal_mode = WAL');
 const createTables = `
     CREATE TABLE IF NOT EXISTS images (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        path TEXT NOT NULL
+        path TEXT NOT NULL,
+        name TEXT
     );
 `
 
@@ -32,6 +34,7 @@ const addImageSql = db.prepare('INSERT INTO images (path) VALUES (?)');
 const getImageSQL = db.prepare('SELECT * FROM images WHERE id=(?)');
 const getImagesSql = db.prepare('SELECT * FROM images');
 const removeImageSql = db.prepare('DELETE FROM images WHERE id=(?)');
+const setImageNameSql = db.prepare('UPDATE images SET name=(?) WHERE id=(?)');
 
 function AddImage(imagePath){
     try {
@@ -64,6 +67,16 @@ function RemoveImage(imageId){
     }
     catch (error){
         console.error('Error removing image from database:', error);
+        throw error;
+    }
+}
+
+function SetName(imageId, name){
+    try {
+        setImageNameSql.run(name, imageId);
+    }
+    catch (error){
+        console.error('Error naming image in database:', error);
         throw error;
     }
 }

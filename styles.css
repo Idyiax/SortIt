@@ -123,6 +123,7 @@ body {
 #metaDisplayContainer {
     width: 100%;
     display: flex;
+    overflow-x: clip;
 }
 
 #nameDisplayBar {
@@ -130,16 +131,25 @@ body {
     height: fit-content;
     background-color: #222222;
     padding: 8px;
+    overflow-x: clip;
 }
 
 #nameDisplayContainer {
-
+    display: inline;
+    align-items: center;
+    overflow-x: clip;
 }
 
 #nameDisplay {
     color: white;
     font-size: 24px;
-    margin: 0px;
+    margin: 0px 12px 0px 4px;
+    padding: 0px;
+    background: none;
+    border: none;
+    field-sizing: content;
+    min-width: 20px;
+    max-width: calc(100% - 32px);
 }
 
 #propertiesContainer {

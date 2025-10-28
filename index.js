@@ -8,6 +8,7 @@ const libraryContainer = document.getElementById('libraryContainer');
 const libraryEntryList = document.getElementById('libraryEntryList');
 const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
+const nameDisplay = document.getElementById('nameDisplay');
 
 // Events
 libraryContainer.addEventListener('dragover', OnLibraryDragOver);
@@ -16,7 +17,9 @@ libraryContainer.addEventListener('drop', OnImageDropped);
 
 libraryContainer.addEventListener('click', OnEntryDeselected);
 
-document.addEventListener('keydown', OnLibraryKeyPressed)
+nameDisplay.addEventListener('change', OnSetName);
+
+document.addEventListener('keydown', OnLibraryKeyPressed);
 
 window.addEventListener('load', OnLoad);
 
@@ -74,6 +77,17 @@ async function OnLoad(){
     Entries.forEach((entry) => {
         CreateDOMEntry(entry.id);
     })
+}
+
+function OnSetName(event){
+    if(SelectedId == null){
+        nameDisplay.value = "";
+        return;
+    }
+    
+    let name = event.target.value;
+    SelectedEntry().name = name;
+    window.api.setName(SelectedId, name);
 }
 
 
@@ -134,7 +148,11 @@ function CreateDOMEntry(id){
     newEntryThumbnail.classList.add('entryThumbnail');
     newEntryThumbnail.src = entry.path;
 
+    //let newEntryName = document.createElement('div');
+    //newEntryName.innerHTML = "test";
+
     newEntryThumbnailContainer.appendChild(newEntryThumbnail);
+    //newEntryThumbnailContainer.appendChild(newEntryName);
     newEntry.appendChild(newEntryThumbnailContainer);
 
     libraryEntryList.appendChild(newEntry);
@@ -155,7 +173,7 @@ function SelectEntry(id){
 
     SelectedId = id;
     imageDisplay.src = entry.path;
-
+    nameDisplay.value = entry.name != null ? entry.name: "";
     entry.html.id = "selectedEntry";
 }
 
@@ -179,4 +197,5 @@ function DeselectEntry(){
     SelectedEntry().html.id = "";
     SelectedId = null;
     imageDisplay.src = "";
+    nameDisplay.value = "";
 }

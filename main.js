@@ -54,6 +54,15 @@ ipcMain.handle('remove-image', (event, imageId) => {
   }
 })
 
+ipcMain.handle('set-image-name', (event, imageId, name) => {
+  try{
+    db.setName(imageId, name);
+  }
+  catch (error){
+    console.error(error);
+  }
+})
+
 // Functions
 async function AddImage(event, image){
   try{
