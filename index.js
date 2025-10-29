@@ -90,7 +90,7 @@ function OnSetName(event){
 
     entry.name = name;
     entry.html.querySelector('.entryName').innerHTML = name;
-    
+
     window.api.setName(SelectedId, name);
 }
 
@@ -182,7 +182,10 @@ function SelectEntry(id){
 
     SelectedId = id;
     imageDisplay.src = entry.path;
-    nameDisplay.value = entry.name != null ? entry.name: "";
+    nameDisplay.disabled = false;
+    if(entry.name != null){}
+    nameDisplay.value = entry.name != null ? entry.name : "";
+    nameDisplay.placeholder = entry.name != null ? "" : "unnamed";
     entry.html.id = "selectedEntry";
 }
 
@@ -207,4 +210,6 @@ function DeselectEntry(){
     SelectedId = null;
     imageDisplay.src = "";
     nameDisplay.value = "";
+    nameDisplay.placeholder = "";
+    nameDisplay.disabled = true;
 }
