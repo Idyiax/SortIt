@@ -86,7 +86,11 @@ function OnSetName(event){
     }
     
     let name = event.target.value;
-    SelectedEntry().name = name;
+    entry = SelectedEntry();
+
+    entry.name = name;
+    entry.html.querySelector('.entryName').innerHTML = name;
+    
     window.api.setName(SelectedId, name);
 }
 
@@ -148,12 +152,17 @@ function CreateDOMEntry(id){
     newEntryThumbnail.classList.add('entryThumbnail');
     newEntryThumbnail.src = entry.path;
 
-    //let newEntryName = document.createElement('div');
-    //newEntryName.innerHTML = "test";
+    let newEntryPropertyContainer = document.createElement('div');
+    newEntryPropertyContainer.classList.add('entryPropertiesContainer');
+
+    let newEntryName = document.createElement('p');
+    newEntryName.classList.add('entryName');
+    if(entry.name != null) newEntryName.innerHTML = entry.name;
 
     newEntryThumbnailContainer.appendChild(newEntryThumbnail);
-    //newEntryThumbnailContainer.appendChild(newEntryName);
+    newEntryPropertyContainer.appendChild(newEntryName);
     newEntry.appendChild(newEntryThumbnailContainer);
+    newEntry.appendChild(newEntryPropertyContainer);
 
     libraryEntryList.appendChild(newEntry);
 
