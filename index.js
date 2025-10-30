@@ -2,6 +2,8 @@
 let SelectedId; // The Id of the selected entry.
 let Entries = []; // All current entries within the database. Populated on window load.
 
+let MultiSelectedIds = [];
+
 
 // Dom elements
 const libraryContainer = document.getElementById('libraryContainer');
@@ -47,7 +49,7 @@ function OnImageDropped(event){
 
 function OnSelectEntry(event, id){
     event.stopPropagation();
-    SelectEntry(id)
+    SelectEntry(id, event.shiftKey, event.ctrlKey)
 }
 
 
@@ -96,8 +98,8 @@ function OnSetName(event){
 
 
 // Main functions
-function GetEntry(entryId){
-    return Entries.find((entry) => entry.id === entryId);
+function GetEntry(id){
+    return Entries.find((entry) => entry.id === id);
 }
 
 function SelectedEntry(){
@@ -171,14 +173,21 @@ function CreateDOMEntry(id){
     entry.html = newEntry;
 }
 
-function SelectEntry(id){
+function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
+    if(shiftKeyHeld){
+        SelectMultiEntry(id);
+        return;
+    }
+
+    if(ctrlKeyHeld){
+        SelectMultiEntry(id);
+        return;
+    }
+
     DeselectEntry();
 
     let entry = GetEntry(id);
-    if(entry == null || entry.path == null){
-        DeselectEntry()
-        return;
-    }
+    if(entry == null) return;
 
     SelectedId = id;
     imageDisplay.src = entry.path;
@@ -186,30 +195,91 @@ function SelectEntry(id){
     if(entry.name != null){}
     nameDisplay.value = entry.name != null ? entry.name : "";
     nameDisplay.placeholder = entry.name != null ? "" : "unnamed";
-    entry.html.id = "selectedEntry";
+    HighlightEntry(id);
+}
+
+function SelectMultiEntry(id){
+    if(SelectedId == id) return;
+    if(GetEntry(id) == null) return;
+
+    EnterMultiSelectMode();
+
+    if(MultiSelectedIds.includes(id)){
+        DeselectMultiEntry(id);
+    }
+
+    MultiSelectedIds.push(id);
+    HighlightEntry(id);
+}
+
+function DeselectMultiEntry(id){
+    if(MultiSelectedIds.length == 0) return;
+    if(GetEntry(id) == null) return;
+
+    MultiSelectedIds.splice(MultiSelectedIds.indexOf(id), 1);
+    UnHighlightEntry(id);
+
+    ExitMultiSelectMode();
+}
+
+function EnterMultiSelectMode(){
+    if(MultiSelectedIds.length == 0){
+        MultiSelectedIds.push(SelectedId);
+        SelectedId = null;
+        ResetDisplayContainer();
+    }
+}
+
+function ExitMultiSelectMode(){
+    if(MultiSelectedIds.length == 1){
+        let lastId = MultiSelectedIds[0];
+        MultiSelectedIds = [];
+        SelectEntry(lastId);
+    }
 }
 
 function SelectNextEntry(){
-    let entryIndex = Entries.findIndex((entry) => entry.id === SelectedId);
+    let entryIndex = Entries.indexOf(SelectedId);
 
     if(entryIndex == Entries.length - 1) SelectEntry(Entries[0].id);
     else SelectEntry(Entries[entryIndex + 1].id);
 }
 
 function SelectPreviousEntry(){
-    let entryIndex = Entries.findIndex((entry) => entry.id === SelectedId);
+    let entryIndex = Entries.indexOf(SelectedId);
     
     if(entryIndex == 0) SelectEntry(Entries[Entries.length - 1].id);
     else SelectEntry(Entries[entryIndex - 1].id);
 }
 
 function DeselectEntry(){
-    if(SelectedId == null) return;
+    ResetDisplayContainer();
 
-    SelectedEntry().html.id = "";
+    if(MultiSelectedIds.length > 0){
+        MultiSelectedIds.forEach((id) => UnHighlightEntry(id));
+        MultiSelectedIds = [];
+    } 
+
+    if(SelectedId == null) return;
+    UnHighlightEntry(SelectedId);
     SelectedId = null;
+}
+
+function ResetDisplayContainer(){
     imageDisplay.src = "";
     nameDisplay.value = "";
     nameDisplay.placeholder = "";
     nameDisplay.disabled = true;
+}
+
+function HighlightEntry(id){
+    let entry = GetEntry(id);
+    if(entry == null) return;
+    entry.html.classList.add("selectedEntry");
+}
+
+function UnHighlightEntry(id){
+    let entry = GetEntry(id);
+    if(entry == null) return;
+    entry.html.classList.remove("selectedEntry");
 }

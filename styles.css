@@ -106,13 +106,13 @@ ul {
     white-space: break-spaces;
 }
 
-#selectedEntry .entryThumbnailContainer {
+.selectedEntry .entryThumbnailContainer {
     background-color: #3a3a3a;
     border: 4px solid #43b0f1;
     padding: 0px;
 }
 
-#selectedEntry:hover .entryThumbnailContainer {
+.selectedEntry:hover .entryThumbnailContainer {
     background-color: #555555;
 }
 
