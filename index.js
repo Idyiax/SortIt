@@ -69,7 +69,8 @@ function OnLibraryKeyPressed(event){
             break;
         case('Delete'):
             event.preventDefault();
-            RemoveEntry(SelectedId);
+            if(SelectedId != null) RemoveEntry(SelectedId);
+            else MultiSelectedIds.forEach((id) => RemoveEntry(id));
             break;
     }
 }
@@ -131,7 +132,7 @@ function AddImageSet(input){
 }
 
 function RemoveEntry(entryId){
-    if(SelectedId == entryId) DeselectEntry();
+    DeselectEntry();
 
     let entry = GetEntry(entryId);
     entry.html.remove()
