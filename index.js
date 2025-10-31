@@ -175,9 +175,32 @@ function CreateDOMEntry(id){
 }
 
 function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
+    if(id == SelectedId) return;
+
     if(shiftKeyHeld){
-        SelectMultiEntry(id);
-        return;
+        if(MultiSelectedIds.length > 1){
+            let lastSelectedEntryId = MultiSelectedIds[MultiSelectedIds.length - 1];
+            DeselectEntry();
+            SelectEntry(lastSelectedEntryId)
+            SelectEntry(id, true, false)
+            return;
+        }
+        else if(SelectedId != null){
+            let selectedEntryIndex = Entries.indexOf(SelectedEntry());
+            let newEntryIndex = Entries.indexOf(GetEntry(id));
+            let indexDif = newEntryIndex - selectedEntryIndex;
+            if(indexDif > 0){
+                for(let i = selectedEntryIndex + 1; i <= newEntryIndex; i++) {
+                    SelectMultiEntry(Entries[i].id);
+                }
+            }
+            else{
+                for(let i = selectedEntryIndex - 1; i >= newEntryIndex; i--) {
+                    SelectMultiEntry(Entries[i].id);
+                }
+            }
+            return;
+        }
     }
 
     if(ctrlKeyHeld){
@@ -202,6 +225,11 @@ function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
 function SelectMultiEntry(id){
     if(SelectedId == id) return;
     if(GetEntry(id) == null) return;
+
+    if(SelectedId == null && MultiSelectedIds.length == 0){
+        SelectEntry(id);
+        return;
+    }
 
     EnterMultiSelectMode();
 
