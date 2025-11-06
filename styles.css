@@ -149,7 +149,6 @@ ul {
 
 #metaDisplayContainer {
     width: 100%;
-    display: flex;
     overflow-x: clip;
 }
 
@@ -181,4 +180,38 @@ ul {
 
 #propertiesContainer {
     margin: 0px;
+}
+
+#tagPanel{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    padding: 8px;
+}
+
+#tagPanelTitleBar h3{
+    color: #dddddd;
+    margin: 0px;
+}
+
+#tagList{
+    margin: 0px;
+    padding: 8px 0px 0px 0px;
+}
+
+.tag{
+    background-color: #666666;
+    opacity: 75%;
+    color: #bbbbbb;
+    margin: 0px;
+    padding: 4px;
+    border-radius: 4px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 11px;
+}
+
+.tag:hover{
+    background-color: #999999;
+    color: white;
+    cursor: pointer;
 }
