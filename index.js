@@ -11,6 +11,7 @@ const libraryEntryList = document.getElementById('libraryEntryList');
 const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
 const nameDisplay = document.getElementById('nameDisplay');
+const tagPanel = document.getElementById('tagPanel');
 
 // Events
 libraryContainer.addEventListener('dragover', OnLibraryDragOver);
@@ -216,6 +217,7 @@ function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
     SelectedId = id;
     imageDisplay.src = entry.path;
     nameDisplay.disabled = false;
+    tagPanel.style.display = "block";
     if(entry.name != null){}
     nameDisplay.value = entry.name != null ? entry.name : "";
     nameDisplay.placeholder = entry.name != null ? "" : "unnamed";
@@ -299,6 +301,7 @@ function ResetDisplayContainer(){
     nameDisplay.value = "";
     nameDisplay.placeholder = "";
     nameDisplay.disabled = true;
+    tagPanel.style.display = "none";
 }
 
 function HighlightEntry(id){

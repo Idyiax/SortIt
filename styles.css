@@ -186,6 +186,7 @@ ul {
     width: calc(100% - 16px);
     height: calc(100% - 16px);
     padding: 8px;
+    display: none;
 }
 
 #tagPanelTitleBar h3{
