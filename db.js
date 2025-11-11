@@ -13,12 +13,26 @@ const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.j
 
 const db = new Database(dbPath)
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
 const createTables = `
     CREATE TABLE IF NOT EXISTS images (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         path TEXT NOT NULL,
         name TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS tagLinks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        imageId INTEGER NOT NULL,
+        tagId INTEGER NOT NULL,
+        FOREIGN KEY (imageId) REFERENCES images (id),
+        FOREIGN KEY (tagId) REFERENCES tags (id)
     );
 `
 
@@ -35,6 +49,10 @@ const getImageSQL = db.prepare('SELECT * FROM images WHERE id=(?)');
 const getImagesSql = db.prepare('SELECT * FROM images');
 const removeImageSql = db.prepare('DELETE FROM images WHERE id=(?)');
 const setImageNameSql = db.prepare('UPDATE images SET name=(?) WHERE id=(?)');
+const getTagSql = db.prepare('SELECT * FROM tags WHERE id=(?)');
+const createTagSql = db.prepare('INSERT INTO tags (name) VALUES (?)');
+const addTagSql = db.prepare('INSERT INTO tagLinks (imageId, tagId) VALUES (?,?)');
+
 
 function AddImage(imagePath){
     try {
@@ -79,4 +97,16 @@ function SetName(imageId, name){
         console.error('Error naming image in database:', error);
         throw error;
     }
+}
+
+function GetTag(){
+
+}
+
+function CreateTag(tagName){
+
+}
+
+function AddTag(imageId, tagName){
+    // if GetTag(tagName) add the tag
 }
