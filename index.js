@@ -12,6 +12,7 @@ const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
 const nameDisplay = document.getElementById('nameDisplay');
 const tagPanel = document.getElementById('tagPanel');
+const tagInput = document.getElementById('tagInput');
 
 // Events
 libraryContainer.addEventListener('dragover', OnLibraryDragOver);
@@ -21,6 +22,7 @@ libraryContainer.addEventListener('drop', OnImageDropped);
 libraryContainer.addEventListener('click', OnEntryDeselected);
 
 nameDisplay.addEventListener('change', OnSetName);
+tagInput.addEventListener('change', OnAddTag);
 
 document.addEventListener('keydown', OnLibraryKeyPressed);
 
@@ -96,6 +98,18 @@ function OnSetName(event){
     entry.html.querySelector('.entryName').innerHTML = name;
 
     window.api.setName(SelectedId, name);
+}
+
+function OnAddTag(event){
+    if(SelectedId == null){
+        return;
+    }
+
+    let tagName = event.target.value;
+    if(tagName == null || tagName == "") return;
+
+    tagInput.value = "";
+    AddTag(tagName);
 }
 
 
@@ -179,6 +193,7 @@ function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
     if(id == SelectedId) return;
 
     if(shiftKeyHeld){
+        // ToDO: Extract into it's own function. This is ugly.
         if(MultiSelectedIds.length > 1){
             let lastSelectedEntryId = MultiSelectedIds[MultiSelectedIds.length - 1];
             DeselectEntry();
@@ -302,6 +317,7 @@ function ResetDisplayContainer(){
     nameDisplay.placeholder = "";
     nameDisplay.disabled = true;
     tagPanel.style.display = "none";
+    tagInput.value = "";
 }
 
 function HighlightEntry(id){
@@ -314,4 +330,12 @@ function UnHighlightEntry(id){
     let entry = GetEntry(id);
     if(entry == null) return;
     entry.html.classList.remove("selectedEntry");
+}
+
+function AddTag(tagName){
+    let newTag = document.createElement('li');
+    newTag.classList.add('tag');
+    newTag.innerHTML = tagName;
+
+    tagInput.before(newTag);
 }
