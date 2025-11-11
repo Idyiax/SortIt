@@ -182,37 +182,47 @@ ul {
     margin: 0px;
 }
 
-#tagPanel{
+#tagPanel {
     width: calc(100% - 16px);
     height: calc(100% - 16px);
     padding: 8px;
     display: none;
 }
 
-#tagPanelTitleBar h3{
+#tagPanelTitleBar h3 {
     color: #dddddd;
     margin: 0px;
 }
 
-#tagList{
+#tagList{ 
     margin: 0px;
     padding: 8px 0px 0px 0px;
+    display: flex;
 }
 
-.tag{
+.tag {
     background-color: #666666;
     opacity: 75%;
     color: #bbbbbb;
-    margin: 0px;
-    padding: 4px;
+    margin: 0px 8px 8px 0px;
+    padding: 4px 6px;
     border-radius: 4px;
     width: fit-content;
     height: fit-content;
-    line-height: 11px;
+    font-size: 16px;
 }
 
-.tag:hover{
+.tag:hover {
     background-color: #999999;
     color: white;
     cursor: pointer;
+}
+
+#tagInput {
+    border: 0px;
+    field-sizing: content;
+}
+
+#tagInput::placeholder {
+    color: #bbbbbb;
 }
