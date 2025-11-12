@@ -63,6 +63,17 @@ ipcMain.handle('set-image-name', (event, imageId, name) => {
   }
 })
 
+ipcMain.handle('get-tags', (event, entryId) => {
+  try{
+    return db.getTags(entryId);
+  }
+  catch (error){
+    console.error(error);
+  }
+});
+
+ipcMain.handle('add-tag', AddTag);
+
 // Functions
 async function AddImage(event, image){
   try{
@@ -102,5 +113,19 @@ async function AddImage(event, image){
   catch(error){
     console.error('Failed to save image', error);
     return undefined;
+  }
+}
+
+function AddTag(event, entryId, tagName){
+  try{
+    let tag = db.findTag(tagName);
+    if(!tag){
+      tag = db.createTag(tagName);
+    }
+    db.addTag(entryId, tag.id);
+    return tag;
+  }
+  catch(error){
+    console.error(error);
   }
 }

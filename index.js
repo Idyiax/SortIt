@@ -238,6 +238,7 @@ function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
     nameDisplay.value = entry.name != null ? entry.name : "";
     nameDisplay.placeholder = entry.name != null ? "" : "unnamed";
     HighlightEntry(id);
+    DisplayTags(id);
 }
 
 function SelectMultiEntry(id){
@@ -334,10 +335,22 @@ function UnHighlightEntry(id){
     entry.html.classList.remove("selectedEntry");
 }
 
-function AddTag(tagName){
+async function DisplayTags(entryId){
+    const tags = await window.api.getTags(entryId);
+    if(tags == null) return;
+    tags.forEach(AddDOMTag);
+}
+
+async function AddTag(tagName){
+    const newTag = await window.api.addTag(SelectedId, tagName);
+
+    AddDOMTag(newTag);
+}
+
+function AddDOMTag(tag){
     const newTag = document.createElement('li');
     newTag.classList.add('tag');
-    newTag.innerHTML = tagName;
+    newTag.innerHTML = tag.name;
 
     tagInput.before(newTag);
 }

@@ -7,6 +7,10 @@ module.exports = {
     getImages: GetImages,
     removeImage: RemoveImage,
     setName: SetName,
+    findTag: FindTag,
+    getTags: GetEntryTags,
+    createTag: CreateTag,
+    addTag: AddTag,
 };
 
 const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.join(process.resourcesPath, 'database.db')
@@ -44,19 +48,21 @@ catch (error){
 }
 
 
-const addImageSql = db.prepare('INSERT INTO images (path) VALUES (?)');
+const createImageSql = db.prepare('INSERT INTO images (path) VALUES (?)');
 const getImageSQL = db.prepare('SELECT * FROM images WHERE id=(?)');
 const getImagesSql = db.prepare('SELECT * FROM images');
 const removeImageSql = db.prepare('DELETE FROM images WHERE id=(?)');
 const setImageNameSql = db.prepare('UPDATE images SET name=(?) WHERE id=(?)');
 const getTagSql = db.prepare('SELECT * FROM tags WHERE id=(?)');
+const findTagSql = db.prepare('SELECT * FROM tags WHERE name=(?)');
+const getEntryTagsSql = db.prepare('SELECT tags.* FROM tags JOIN tagLinks ON tags.id = tagLinks.tagId WHERE tagLinks.imageId=(?)');
 const createTagSql = db.prepare('INSERT INTO tags (name) VALUES (?)');
 const addTagSql = db.prepare('INSERT INTO tagLinks (imageId, tagId) VALUES (?,?)');
 
 
 function AddImage(imagePath){
     try {
-        const newImageId = addImageSql.run(imagePath).lastInsertRowid;
+        const newImageId = createImageSql.run(imagePath).lastInsertRowid;
         return getImageSQL.get(newImageId);
     }
     catch (error){
@@ -99,14 +105,48 @@ function SetName(imageId, name){
     }
 }
 
-function GetTag(){
+function GetTag(tagId){
+    try {
+        return getTagSql.get(tagId);
+    }
+    catch (error){
+        console.error(`Could not find a tag with the id ${tagId}:`, error);
+        throw error;
+    }
+}
 
+function FindTag(tagName){
+    try {
+        return findTagSql.get(tagName);
+    }
+    catch (error){
+        console.error(`Could not find a tag with the name ${tagName}:`, error);
+        throw error;
+    }
+}
+
+function GetEntryTags(entryId){
+    return tags = getEntryTagsSql.all(entryId);
 }
 
 function CreateTag(tagName){
-
+    try {
+        if(FindTag(tagName)) return 'A tag with this name already exists.'
+        const newTagId = createTagSql.run(tagName).lastInsertRowid;
+        return GetTag(newTagId);
+    }
+    catch (error){
+        console.error('Error adding image to database:', error)
+        throw error;
+    }
 }
 
-function AddTag(imageId, tagName){
-    // if GetTag(tagName) add the tag
+function AddTag(imageId, tagId){
+    try {
+        addTagSql.run(imageId, tagId);
+    }
+    catch (error){
+        console.error('Error adding image to database:', error)
+        throw error;
+    }
 }
