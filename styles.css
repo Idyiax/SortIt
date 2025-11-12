@@ -227,3 +227,7 @@ ul {
 #tagInput::placeholder {
     color: #bbbbbb;
 }
+
+#tagInput:focus::placeholder {
+    color: transparent;
+}
