@@ -10,7 +10,8 @@ module.exports = {
     findTag: FindTag,
     getTags: GetEntryTags,
     createTag: CreateTag,
-    addTag: AddTag,
+    addTag: AddEntryTag,
+    removeTag: RemoveEntryTag,
 };
 
 const dbPath = process.env.NODE_ENV === 'development' ? './database.db' : path.join(process.resourcesPath, 'database.db')
@@ -55,9 +56,11 @@ const removeImageSql = db.prepare('DELETE FROM images WHERE id=(?)');
 const setImageNameSql = db.prepare('UPDATE images SET name=(?) WHERE id=(?)');
 const getTagSql = db.prepare('SELECT * FROM tags WHERE id=(?)');
 const findTagSql = db.prepare('SELECT * FROM tags WHERE name=(?)');
+const checkEntryTagSql = db.prepare('SELECT * FROM tagLinks WHERE imageId=(?) AND tagId=(?)');
 const getEntryTagsSql = db.prepare('SELECT tags.* FROM tags JOIN tagLinks ON tags.id = tagLinks.tagId WHERE tagLinks.imageId=(?)');
 const createTagSql = db.prepare('INSERT INTO tags (name) VALUES (?)');
-const addTagSql = db.prepare('INSERT INTO tagLinks (imageId, tagId) VALUES (?,?)');
+const addEntryTagSql = db.prepare('INSERT INTO tagLinks (imageId, tagId) VALUES (?,?)');
+const removeEntryTagSql = db.prepare('DELETE FROM tagLinks WHERE imageId=(?) AND tagId=(?)');
 
 
 function AddImage(imagePath){
@@ -66,7 +69,7 @@ function AddImage(imagePath){
         return getImageSQL.get(newImageId);
     }
     catch (error){
-        console.error('Error adding image to database:', error)
+        console.error('Error adding image:', error)
         throw error;
     }
 }
@@ -76,7 +79,7 @@ function GetImage(imageId){
         return getImageSQL.get(imageId);
     }
     catch (error){
-        console.error('Error getting image from database:', error);
+        console.error(`Could not find an image with the id ${imageId}:`, error);
         throw error;
     }
 }
@@ -90,7 +93,7 @@ function RemoveImage(imageId){
         removeImageSql.run(imageId);
     }
     catch (error){
-        console.error('Error removing image from database:', error);
+        console.error('Error removing image:', error);
         throw error;
     }
 }
@@ -100,7 +103,7 @@ function SetName(imageId, name){
         setImageNameSql.run(name, imageId);
     }
     catch (error){
-        console.error('Error naming image in database:', error);
+        console.error('Error naming image:', error);
         throw error;
     }
 }
@@ -136,17 +139,28 @@ function CreateTag(tagName){
         return GetTag(newTagId);
     }
     catch (error){
-        console.error('Error adding image to database:', error)
+        console.error('Error creating tag:', error)
         throw error;
     }
 }
 
-function AddTag(imageId, tagId){
+function AddEntryTag(entryId, tagId){
     try {
-        addTagSql.run(imageId, tagId);
+        if(checkEntryTagSql.get(entryId, tagId)) return;
+        addEntryTagSql.run(entryId, tagId);
     }
     catch (error){
-        console.error('Error adding image to database:', error)
+        console.error('Error adding tag', error)
+        throw error;
+    }
+}
+
+function RemoveEntryTag(entryId, tagId){
+    try {
+        removeEntryTagSql.run(entryId, tagId);
+    }
+    catch (error){
+        console.error('Error removing tag from entry:', error)
         throw error;
     }
 }

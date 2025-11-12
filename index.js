@@ -320,7 +320,7 @@ function ResetDisplayContainer(){
     nameDisplay.disabled = true;
     tagPanel.style.display = "none";
     tagInput.value = "";
-    ClearTags();
+    ClearDOMags();
 }
 
 function HighlightEntry(id){
@@ -351,11 +351,17 @@ function AddDOMTag(tag){
     const newTag = document.createElement('li');
     newTag.classList.add('tag');
     newTag.innerHTML = tag.name;
+    newTag.addEventListener('contextmenu', (event) => RemoveTag(event, tag));
 
     tagInput.before(newTag);
 }
 
-function ClearTags(){
+async function RemoveTag(event, tag){
+    await window.api.removeTag(SelectedId, tag.id);
+    event.target.remove();
+}
+
+function ClearDOMags(){
     while(true){
         if(tagList.firstChild === tagInput) return;
         tagList.firstChild.remove();

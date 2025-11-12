@@ -72,7 +72,28 @@ ipcMain.handle('get-tags', (event, entryId) => {
   }
 });
 
-ipcMain.handle('add-tag', AddTag);
+ipcMain.handle('add-tag', (event, entryId, tagName) => {
+  try{
+    let tag = db.findTag(tagName);
+    if(!tag){
+      tag = db.createTag(tagName);
+    }
+    db.addTag(entryId, tag.id);
+    return tag;
+  }
+  catch(error){
+    console.error(error);
+  }
+});
+
+ipcMain.handle('remove-tag', (event, entryId, tagId) => {
+  try{
+    db.removeTag(entryId, tagId);
+  }
+  catch(error){
+    console.error(error);
+  }
+});
 
 // Functions
 async function AddImage(event, image){
@@ -113,19 +134,5 @@ async function AddImage(event, image){
   catch(error){
     console.error('Failed to save image', error);
     return undefined;
-  }
-}
-
-function AddTag(event, entryId, tagName){
-  try{
-    let tag = db.findTag(tagName);
-    if(!tag){
-      tag = db.createTag(tagName);
-    }
-    db.addTag(entryId, tag.id);
-    return tag;
-  }
-  catch(error){
-    console.error(error);
   }
 }
