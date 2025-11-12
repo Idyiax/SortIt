@@ -12,6 +12,7 @@ const displayContainer = document.getElementById('displayContainer');
 const imageDisplay = document.getElementById('imageDisplay');
 const nameDisplay = document.getElementById('nameDisplay');
 const tagPanel = document.getElementById('tagPanel');
+const tagList = document.getElementById('tagList');
 const tagInput = document.getElementById('tagInput');
 
 // Events
@@ -91,7 +92,7 @@ function OnSetName(event){
         return;
     }
     
-    let name = event.target.value;
+    const name = event.target.value;
     entry = SelectedEntry();
 
     entry.name = name;
@@ -105,7 +106,7 @@ function OnAddTag(event){
         return;
     }
 
-    let tagName = event.target.value;
+    const tagName = event.target.value;
     if(tagName == null || tagName == "") return;
 
     tagInput.value = "";
@@ -149,7 +150,7 @@ function AddImageSet(input){
 function RemoveEntry(entryId){
     DeselectEntry();
 
-    let entry = GetEntry(entryId);
+    const entry = GetEntry(entryId);
     entry.html.remove()
 
     window.api.removeImage(entryId);
@@ -226,7 +227,7 @@ function SelectEntry(id, shiftKeyHeld = false, ctrlKeyHeld = false){
 
     DeselectEntry();
 
-    let entry = GetEntry(id);
+    const entry = GetEntry(id);
     if(entry == null) return;
 
     SelectedId = id;
@@ -278,21 +279,21 @@ function EnterMultiSelectMode(){
 
 function ExitMultiSelectMode(){
     if(MultiSelectedIds.length == 1){
-        let lastId = MultiSelectedIds[0];
+        const lastId = MultiSelectedIds[0];
         MultiSelectedIds = [];
         SelectEntry(lastId);
     }
 }
 
 function SelectNextEntry(){
-    let entryIndex = Entries.indexOf(SelectedId);
+    const entryIndex = Entries.indexOf(SelectedId);
 
     if(entryIndex == Entries.length - 1) SelectEntry(Entries[0].id);
     else SelectEntry(Entries[entryIndex + 1].id);
 }
 
 function SelectPreviousEntry(){
-    let entryIndex = Entries.indexOf(SelectedId);
+    const entryIndex = Entries.indexOf(SelectedId);
     
     if(entryIndex == 0) SelectEntry(Entries[Entries.length - 1].id);
     else SelectEntry(Entries[entryIndex - 1].id);
@@ -318,24 +319,32 @@ function ResetDisplayContainer(){
     nameDisplay.disabled = true;
     tagPanel.style.display = "none";
     tagInput.value = "";
+    ClearTags();
 }
 
 function HighlightEntry(id){
-    let entry = GetEntry(id);
+    const entry = GetEntry(id);
     if(entry == null) return;
     entry.html.classList.add("selectedEntry");
 }
 
 function UnHighlightEntry(id){
-    let entry = GetEntry(id);
+    const entry = GetEntry(id);
     if(entry == null) return;
     entry.html.classList.remove("selectedEntry");
 }
 
 function AddTag(tagName){
-    let newTag = document.createElement('li');
+    const newTag = document.createElement('li');
     newTag.classList.add('tag');
     newTag.innerHTML = tagName;
 
     tagInput.before(newTag);
+}
+
+function ClearTags(){
+    while(true){
+        if(tagList.firstChild === tagInput) return;
+        tagList.firstChild.remove();
+    }
 }
